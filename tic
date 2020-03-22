@@ -1,2 +1,2 @@
 #/bin/bash
-/Volumes/tic80/tic80.app/Contents/MacOS/tic80 skyrokit.tic
+/Volumes/tic80/tic80.app/Contents/MacOS/tic80 skyrokit.tic -nosound -skip

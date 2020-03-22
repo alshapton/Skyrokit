@@ -1,2 +1,7 @@
-# Skyrokit
-A basic "fly a rocket game" for the TIC-80 computer
+# **Skyrokit** #
+
+Fly your rocket as high as you can.
+
+For the TIC-80 computer
+
+<img src="skyrokit.png">
