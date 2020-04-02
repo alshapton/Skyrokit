@@ -64,8 +64,8 @@ function startup()
  heatbottom   = 136       -- bottom of heat gauge
  heatuse      = 5         -- unit of heat
 	
- show_pad         = 1     -- 1=show launchpad / 0=dont show launchpad
- played_eog_sound = 0
+ show_pad         = 1     -- 1=show launchpad/0=dont show launchpad
+ played_eog_sound = 0     -- 0 or 1 - playing end of game sound ?
  launchtop        = 100
 
 end
@@ -75,42 +75,42 @@ end
 
 function fill_stars()
 --- fill stars table 
-	for i=0,100 do
-			star ={		
-					x  = math.random(0,240),
-					y  = math.random(0,160),
-				 sp = math.random(1,3),-- speed
-					color = math.random(0,15),
-					size = math.random(1,2)
-		   }
-					stars[i]=star
+ for i=0,100 do
+		star = {		
+			x  = math.random(0,240),
+			y  = math.random(0,160),
+			sp = math.random(1,3),-- speed
+			color = math.random(0,15),
+			size = math.random(1,2)
+		 }
+  stars[i]=star
 	end
 end
 
-function dstars(limit,color)
-counter=0
-for s,b in pairs(stars) do
-					if counter < limit then
-						b.y = b.y + b.sp
-						if b.y > 140 then	
-						 b.y=0 
-						end
-      thiscolor =0
-						-- set  star colour
-						if color ~= -1 then					
-       thiscolor=color
-						else
-						 thiscolor=b.color
-						end
--- 					else
-						if b.size <=1 then
- 					 pix(b.x,b.y,thiscolor)
-						else 
-							circ(b.x,b.y,b.size,thiscolor)
-						end
-					end	
-				 counter=counter+1
-    end
+function dstars(limit,color) 
+ counter=0
+ for s,b in pairs(stars) do
+	 if counter < limit then
+			b.y = b.y + b.sp
+			if b.y > 140 then	
+				b.y=0 
+			end
+			thiscolor =0
+			-- set  star colour
+			if color ~= -1 then
+			 thiscolor=color
+			else
+				thiscolor=b.color
+			end
+--else
+			if b.size <=1 then
+			 pix(b.x,b.y,thiscolor)
+			else 
+			 circ(b.x,b.y,b.size,thiscolor)
+			end
+		end
+		counter=counter+1
+	end
 end
 
 --- Starfield
@@ -120,7 +120,7 @@ end
 function sound(snd,p1,p2,p3,p4,p5)
  if sound_on == 1 then
 	 sfx(snd,p1,p2,p3,p4,p5)
-	end
+ end
 end
 
 

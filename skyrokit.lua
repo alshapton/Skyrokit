@@ -75,42 +75,42 @@ end
 
 function fill_stars()
 --- fill stars table 
-	for i=0,100 do
-			star ={		
-					x  = math.random(0,240),
-					y  = math.random(0,160),
-				 sp = math.random(1,3),-- speed
-					color = math.random(0,15),
-					size = math.random(1,2)
-		   }
-					stars[i]=star
+ for i=0,100 do
+		star = {		
+			x  = math.random(0,240),
+			y  = math.random(0,160),
+			sp = math.random(1,3),-- speed
+			color = math.random(0,15),
+			size = math.random(1,2)
+		 }
+  stars[i]=star
 	end
 end
 
-function dstars(limit,color)
-counter=0
-for s,b in pairs(stars) do
-					if counter < limit then
-						b.y = b.y + b.sp
-						if b.y > 140 then	
-						 b.y=0 
-						end
-      thiscolor =0
-						-- set  star colour
-						if color ~= -1 then					
-       thiscolor=color
-						else
-						 thiscolor=b.color
-						end
--- 					else
-						if b.size <=1 then
- 					 pix(b.x,b.y,thiscolor)
-						else 
-							circ(b.x,b.y,b.size,thiscolor)
-						end
-					end	
-				 counter=counter+1
-    end
+function dstars(limit,color) 
+ counter=0
+ for s,b in pairs(stars) do
+	 if counter < limit then
+			b.y = b.y + b.sp
+			if b.y > 140 then	
+				b.y=0 
+			end
+			thiscolor =0
+			-- set  star colour
+			if color ~= -1 then
+			 thiscolor=color
+			else
+				thiscolor=b.color
+			end
+--else
+			if b.size <=1 then
+			 pix(b.x,b.y,thiscolor)
+			else 
+			 circ(b.x,b.y,b.size,thiscolor)
+			end
+		end
+		counter=counter+1
+	end
 end
 
 --- Starfield
@@ -120,36 +120,32 @@ end
 function sound(snd,p1,p2,p3,p4,p5)
  if sound_on == 1 then
 	 sfx(snd,p1,p2,p3,p4,p5)
-	end
+ end
 end
 
 
 function launchpad()
-if rocket.inflight==1 then
+ if rocket.inflight==1 then
   launchtop=launchtop-0.5 
-end
+ end
 
-if launchtop < 10 then
- show_pad=0
-else
-
-line(88,200-launchtop+35,134,200-launchtop+35,4)
-line(88,200-launchtop+34,134,200-launchtop+34,4)
-spr(0,104,230-launchtop,-1,2,1,0,1,1)  
-for i=226,170, -8 do
- spr(256,88,i-launchtop,-1,1,1,0,1,1)  
-end
-spr(257,96,200-launchtop+4,0,1,1,0,1,1)
-spr(257,104,200-launchtop+4,0,1,1,0,1,1)
-spr(258,96,200-launchtop-8,0,1,1,0,1,1)
-spr(259,96,200-launchtop+20,0,1,0,0,1,1)
-spr(259,92,200-launchtop+23,0,1,0,0,1,1)
-spr(259,86,200-launchtop+26,0,1,0,0,1,1)
-
-spr(272,70,200-launchtop+28,0,1,0,0,2,1)
-
-
-end
+ if launchtop < 10 then
+  show_pad=0
+ else
+  line(88,200-launchtop+35,134,200-launchtop+35,4)
+  line(88,200-launchtop+34,134,200-launchtop+34,4)
+  spr(0,104,230-launchtop,-1,2,1,0,1,1)  
+  for i=226,170, -8 do
+   spr(256,88,i-launchtop,-1,1,1,0,1,1)  
+  end
+  spr(257,96,200-launchtop+4,0,1,1,0,1,1)
+  spr(257,104,200-launchtop+4,0,1,1,0,1,1)
+  spr(258,96,200-launchtop-8,0,1,1,0,1,1)
+  spr(259,96,200-launchtop+20,0,1,0,0,1,1)
+  spr(259,92,200-launchtop+23,0,1,0,0,1,1)
+  spr(259,86,200-launchtop+26,0,1,0,0,1,1)
+  spr(272,70,200-launchtop+28,0,1,0,0,2,1)
+ end
 end
 
 

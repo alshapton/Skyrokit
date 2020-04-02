@@ -11,9 +11,9 @@ if [ $DIFF -eq 0 ]
   exit
  fi
 echo "[Rolling previous versions]"
-cp ../skyrokit.lua.-2 ../skyrokit.lua.-3
-cp ../skyrokit.lua.-1 ../skyrokit.lua.-2
-cp ../skyrokit.lua ../skyrokit.lua.-1
+cp ../archive/skyrokit.lua.-2 ../archive/skyrokit.lua.-3
+cp ../archive/skyrokit.lua.-1 ../archive/skyrokit.lua.-2
+cp ../skyrokit.lua ../archive/skyrokit.lua.-1
 echo "[Rolling previous versions complete]"
 mv tmp.lua ../skyrokit.lua
 echo "[Finalised code extraction]"
