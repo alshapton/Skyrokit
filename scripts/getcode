@@ -1,0 +1,19 @@
+#!/usr/local/bin/zsh
+# Extract the current codebase
+python extract.py
+
+# Check to see if extraction is required
+# by comparing the current and previous versions
+DIFF=`diff ../skyrokit.lua tmp.lua | wc -l | tr -d '[:space:]'`
+if [ $DIFF -eq 0 ]
+ then
+  echo "[Current codebase already extracted]"
+  exit
+ fi
+echo "[Rolling previous versions]"
+cp ../skyrokit.lua.-2 ../skyrokit.lua.-3
+cp ../skyrokit.lua.-1 ../skyrokit.lua.-2
+cp ../skyrokit.lua ../skyrokit.lua.-1
+echo "[Rolling previous versions complete]"
+mv tmp.lua ../skyrokit.lua
+echo "[Finalised code extraction]"
