@@ -2,3 +2,7 @@
 ~$*.*
 tic80.app
 tic80_0.70.6.dmg
+.local
+!.local/cache
+!.local/config*
+!.local/default.tic

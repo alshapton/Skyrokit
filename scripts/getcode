@@ -8,6 +8,7 @@ DIFF=`diff ../skyrokit.lua tmp.lua | wc -l | tr -d '[:space:]'`
 if [ $DIFF -eq 0 ]
  then
   echo "[Current codebase already extracted]"
+  rm tmp.lua
   exit
  fi
 echo "[Rolling previous versions]"
