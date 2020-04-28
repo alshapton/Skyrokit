@@ -9,6 +9,8 @@
 -- ================================== --
 
 function startup()
+ in_space     = 500
+	comet        = false
  sound_on     = 0
  music_on     = 0
  version      = "0.1"
@@ -41,7 +43,14 @@ function startup()
  fill_stars()        -- populate stars array
 
  in_game   = -1      -- not started game yet
- 
+ cometheight1 = {
+	                x = 0,
+														   y = 0
+												   	} 
+	cometheight2 = {
+	                x = 0,
+														   y = 0
+												   	}
 	-- Initialise rocket
  rocket = {
 	          t        = 266, -- sprite ID of rocket
@@ -248,7 +257,7 @@ function display_starfield()
   if starlimit >99 then
    starlimit = 99
   end
-  if timeinflight > 500 then
+  if timeinflight > in_space then
    dstars(starlimit,-1) -- remember to change colours here.
   end
  end
@@ -256,6 +265,18 @@ end
 
 function display_rocket()
 -- display the rocket in flight
+
+-- change flame sprite if required
+ if c == 5 then
+  if rocket.t == 262 then
+   rocket.t=266
+  else
+   rocket.t=262
+  end
+  -- reset ticker to zero
+  c = 0
+ end
+		
  spr(rocket.t,rocket.x,rocket.y-1,0,1,0,0,4,10)
  if show_pad == 1 then
   spr(271,rocket.x,rocket.y+31,0,1,0,0,1,3)
@@ -289,156 +310,74 @@ function display_rocket()
  end
 end
 
--- ================================== --
---    E N D  O F  F U N C T I O N S   --
--- ================================== --
+function display_gauge()
+ -- set colour of heat
+ if heatbottom <=26 then
+  heatcolour=red
+ else
+  heatcolour=orange
+ end
+	
+ -- gauge background
+ rect(220,10,20,126,4)
+ -- fuel
+ rect(230,fueltop,10,fuel,11)
+ rectb(230,10,10,126,15)
+ -- heat
+ rect(220,heatbottom,10,300,heatcolour)
+ rectb(220,10,10,126,15)  
+ rectb(220,10,10,20,15)   
+ --labels
+ print("H",222,2)
+ print("F",232,2)
 
--- Startup
-startup()
-
--- Background gradient
-function SCN(line)
- poke(0x3fc2,line)
 end
 
---- Main Loop (frame)
-function TIC()
- -- clear display before frame
- cls(0)
- if in_game == -1 then
-  startscreen()
- else
-  if in_game <2 then	
- 		heatframe = heatframe+1	
-  	if btnp(0,1,1) then
-		  if in_game == 0 then
-		   seconds = 0
-    end
-    in_game          = 1 -- game is on
-    rocket.inflight  = 1
-    heattick = heattick+1	-- update heat ticker because fuel is being used
-    fueltick = fueltick+1	-- update fuel ticker because fuel is being used
-    if seconds >= 60 then
-				 dseconds = dseconds + 1
-					seconds = 0
-					if dseconds >=60 then
-					 dmins=dmins+1
-						dseconds=0
-					end
-					if dmins >=60 then
-					 dhours=dhours+1
-						dmins=0
-					end
-										
-				else
-     timeinflight = timeinflight+1
-
-     score = score + score_increment
-     seconds = seconds + 1
-	 	 end
-				if rocket.y > 2 then
-			  rocket.y=rocket.y-1
-		  end 
-		 else
-			 if rocket.y < 82 then
-			  rocket.y=rocket.y+1     
-			 end 
-		 end
-		
- 
-		-- update	 tickers
-		c=c+1
- 		
-	
-		-- change flame sprite if required
-		if c == 5 then
-		 if rocket.t == 262 then
-		 	rocket.t=266
-		 else
-		  rocket.t=262
-		 end
-		c=0
-		end
-  -- reduce fuel if required
-		if fueltick >= 100 then
-		 fuel = fuel - fueluse
-			fueltop = fueltop + fueluse
-			fueltick = 0
-		end
-  -- manage heat
-		if heatframe >= 60 then
-			if btnp(0,1,1) then
-    heatbottom=heatbottom-heatuse
-    else
-				if heatbottom <= 137 then
-     heatbottom=heatbottom+heatuse
-				end		  
+function display_score()
+ -- Score
+ if rocket.inflight == 1 then
+  if in_game ~= 2 then
+   outputs=""
+   if dseconds <10 then
+    outputs="0"..outputs
    end
-			heatframe=0
-			heattick = 0
-		end		
-		
-		end
- 
-	 -- Display (z-order - reverse to front)
-	
-		-- starfield
-  display_starfield()
+   if seconds >= 60 then
+    dseconds = dseconds + 1
+    seconds = 0
+    if dseconds >=60 then
+     dmins=dmins+1
+     dseconds=0
+    end
+    if dmins >=60 then
+     dhours=dhours+1
+     dmins=0
+    end
+   else
+    timeinflight = timeinflight+1
+    score = score + score_increment
+    seconds = seconds + 1
+   end			
+			
+   outputh=tostring(dhours) .. "h"
+   if dhours <10 then
+    outputh="0"..outputh
+   end
+   outputm=tostring(dmins) .. "m"
+   if dmins <10 then
+    outputm="0"..outputm
+   end
 
-		-- rocket
-  display_rocket()
+   outputs=tostring(dseconds) .. "s"
+   print (outputh..":".. outputm..":"..outputs,0,0)
+   print ("Score:"..score,0,10)
+  end
+ end
+end
 
--- gauge
-  -- set colour of heat
-		if heatbottom <=26 then
-		  heatcolour=red
-			else
-			 heatcolour=orange
-		end
-  
-		
-		-- gauge background
-		rect(220,10,20,126,4)
-  -- fuel
-  rect(230,fueltop,10,fuel,11)
-  rectb(230,10,10,126,15)  
-  -- heat
-  rect(220,heatbottom,10,300,heatcolour)
-  rectb(220,10,10,126,15)  
-  rectb(220,10,10,20,15)   
-  --labels
-		print("H",222,2)
-		print("F",232,2)
-
-  -- Score
-		if rocket.inflight == 1 then
-		 if in_game ~= 2 then
- 
-				outputh=tostring(dhours) .. "h"
-			 if dhours <10 then
-				 outputh="0"..outputh
-				end
-				
-			 outputm=tostring(dmins) .. "m"
-			 if dmins <10 then
-				 outputm="0"..outputm
-				end
-				
-				outputs=tostring(dseconds) .. "s"
-			 if dseconds <10 then
-				 outputs="0"..outputs
-				end
-				
-				
-    print (outputh..":".. outputm..":"..outputs,0,0)
-				print ("Score:"..score,0,10)
-
-			end
-		end
-
-  -- Game Over
-  if heatbottom <=15 or ( timeinflight >1 and  rocket.y == 82) then
-		 in_game = 2 -- game over
+function is_game_over()
+ -- check to see if the game is over
+ if heatbottom <=15 or ( timeinflight >1 and  rocket.y == 82) then
+		in_game = 2 -- game over
 		 print ("Game Over ",90,90)
 			music()
    if timeinflight > Phiscore then
@@ -453,9 +392,182 @@ function TIC()
 	   played_eog_sound = 1
 			end
 		end
-		launchpad()
-	end
+end
 
+function manage_heat()
+ if heatframe >= 60 then
+  if btnp(0,1,1) then
+   heatbottom=heatbottom-heatuse
+  else
+   if heatbottom <= 137 then
+    heatbottom=heatbottom+heatuse
+   end
+  end
+  heatframe = 0
+  heattick  = 0
+ end			
+end
+
+function reduce_fuel()
+-- If fuel needs reducing then do so
+ if fueltick >= 100 then
+  fuel     = fuel    - fueluse
+  fueltop  = fueltop + fueluse
+  fueltick = 0
+ end
+end
+
+function manage_gauges()
+ -- reduce fuel if required
+ reduce_fuel()		
+		
+ -- manage heat
+ manage_heat()
+end
+
+function angleBetweenPoints(a, b)
+deltaY = math.abs(b.y - a.y)
+deltaX = math.abs(b.x - a.x)
+return math.deg(math.atan2(deltaY,deltaX))
+end
+
+function distance(p, q)
+dx   = p.x - q.x         
+dy   = p.y - q.y         
+dist = math.sqrt( dx*dx + dy*dy ) 
+return dist
+end
+-- ================================== --
+--    M A J O R   F U N C T I O N S   --
+-- ================================== --
+
+function display()
+ -- Display (z-order - reverse to front)
+	
+ -- starfield
+ display_starfield()
+
+ -- rocket
+ display_rocket()
+
+ -- gauge
+ display_gauge()
+		  
+ --	score
+ display_score()
+
+ -- Game Over ?
+ is_game_over()
+		
+ -- show launchpad ?
+ launchpad()
+end
+
+
+-- ================================== --
+--    E N D  O F  F U N C T I O N S   --
+-- ================================== --
+
+-- Startup
+startup()
+
+
+-- Background gradient
+function SCN(line)
+ if timeinflight < in_space then
+		poke(0x3fc2,line)
+	end
+ if timeinflight > in_space then
+		poke(0x3fc1,line)
+	end
+ if timeinflight > (in_space*2) then
+		poke(0x3fc0,line)
+			
+ end 
+	
+end
+
+-- Foreground graphics
+function OVR()
+if in_game == 1 then
+if timeinflight > in_space then
+--comet
+if comet == false then
+	cometyes = math.random(0,10)
+	if cometyes < 4 then
+ -- 	create comet
+	 comet = true
+	 rside = math.random(0,1)
+  if rside < 0.5 then
+			 cometheight1.y = math.random(0,64)
+	 cometheight1.x = 0
+  cometheight2.x = 220
+	 cometheight2.y = 64 + math.random(0,64)
+  else
+	 cometheight1.y = math.random(0,64)
+	 cometheight1.x = 220
+  cometheight2.x = 0
+	 cometheight2.y = 64 + math.random(0,64)
+  end
+		cx= cometheight1.x
+	 cy=	cometheight1.y
+	 angle = angleBetweenPoints(cometheight1, cometheight2)
+  dist  = distance(cometheight1, cometheight2)
+  speed_in_tics=30 * math.random(1,10)  -- 2 seconds
+  dx=(cometheight1.x-cometheight2.x)
+  dy=(cometheight1.y-cometheight2.y)
+	 vecx=dx/speed_in_tics
+	 vecy=dy/speed_in_tics 
+ end
+	else
+	 cx=cx-vecx
+	 cy=cy-vecy
+		-- ensure comets are not drawn over the gauges
+		clip(0,0,219,128)
+	 circ(cx,cy,5,15)
+  clip()
+		if cx > 240 or cx < 0 then
+		comet = false
+		end
+end
+end
+end
+end
+
+
+--- Main Loop (frame)
+function TIC()
+ -- clear display before frame
+ cls(0)
+ if in_game == -1 then
+  startscreen()
+ else
+  if in_game <2 then	
+ 		heatframe = heatframe+1	
+  	if btnp(0,1,1) then
+		  if in_game == 0 then
+		   seconds = 0
+    end
+   in_game          = 1 -- game is on
+   rocket.inflight  = 1
+   heattick = heattick+1	-- update heat ticker because fuel is being used
+   fueltick = fueltick+1	-- update fuel ticker because fuel is being used
+   if rocket.y > 2 then
+			  rocket.y=rocket.y-1
+		 end 
+		 else
+			 if rocket.y < 82 then
+			  rocket.y=rocket.y+1     
+			 end 
+		 end
+		
+		 -- update	 tickers
+		 c=c+1
+		 manage_gauges()	
+		end
+  -- show display
+  display()
+	end
 end
 
 -- end:  Skyrokit
