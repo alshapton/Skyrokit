@@ -4,16 +4,98 @@
 -- script: lua
 -- saveid: Skyrokit-SAVE 
 
+-- Version: 0.2
 -- ================================== --
 -- S T A R T   O F  F U N C T I O N S --
 -- ================================== --
 
+function position_landinggear()
+ bx = rocket.x+10
+	by = rocket.y+40
+
+ -- left landing gear
+ f={x=bx,y=by}
+ t={x=bx+30,y=by}
+ f2={x=bx,y=by}
+ t2={x=bx+10,y=by}
+
+ -- right landing gear
+ fr={x=f.x+rw,y=by}
+ tr={x=t.x+rw,y=by}
+ fr2={x=f2.x+rw,y=by}
+ tr2={x=t2.x+rw,y=by}
+end 
+
+function setup_landinggear()
+show_landing_gear = false
+--rocket width
+rw=10
+-- landing gear core angles
+angl = 270
+angr = 90
+
+-- landinggear intermediate store
+p={x=0,y=0}
+end
+
+function r(f,a,t)
+-- calculate end points of line given angle
+local c,an,s
+an=a*(3.141/180)
+c=math.cos(an)
+s=math.sin(an)
+p.x=((c*(t.x-f.x))-(s*(t.y-f.y))+f.x)
+p.y=((s*(t.x-f.x))+(c*(t.y-f.y))+f.y)
+return p
+end
+
+function gear(f,t,angl,fr,tr,angr)
+local p
+p=r(f,angl,t)
+line(f.x,f.y,p.x,p.y,15)
+line(f.x-1,f.y,p.x-1,p.y,15)
+line(f2.x,f2.y-10,p.x,p.y,15)
+p=r(f2,angl,t2)
+line(f2.x,f2.y-10,p.x,p.y,15)
+angr=angr+180
+p=r(fr,angr,tr)
+line(fr.x,fr.y-10,p.x,p.y,15)
+line(fr.x-1,fr.y,p.x-1,p.y,15)
+line(fr2.x,fr2.y,p.x,p.y,15)
+p=r(fr2,angr,tr2)
+line(fr2.x,fr2.y-10,p.x,p.y,15)
+end
+
+function landinggear()
+if show_landing_gear == true then
+position_landinggear()
+if angl >135 then
+angl=angl-0.5
+end
+if angr <225 then
+angr=angr+0.5
+end
+gear(f,t,angl,fr,tr,angr)
+end
+
+end
+
+
 function startup()
+ hsteer       = 0.5 --- horizontal steering factor
+ TICS_IN_SEC  = 60
+ crawlstay    = 0
+ crawlstaytime= TICS_IN_SEC * 10 -- 10 seconds
+ docrawl      = 1
+ crawlspace   = 0.15
+ finishcrawl  = (crawlspace * 1000) * 2.3
+ interval     = 10
+ topcrawl     = 128
  in_space     = 500
-	comet        = false
+ comet        = false
  sound_on     = 0
  music_on     = 0
- version      = "0.1"
+ version      = "0.2"
  starlimit    = 1
  seconds      = 0
  mins         = 0
@@ -28,13 +110,14 @@ function startup()
  Phiscore = pmem(0) -- persistent memory hiscore
  Psound   = pmem(1) -- persistent memory score
  Pmusic   = pmem(2) -- persistent memory music
-
- 
- heatframe  = 0
- orange     = 9
- red        = 6
- heatcolour = orange
- fuel       = 130    -- how much fuel we start  with
+  
+	payload      = {x=-1,y=-1}
+ show_payload = false 
+ heatframe    = 0
+ orange       = 9
+ red          = 6
+ heatcolour   = orange
+ fuel         = 130 -- how much fuel we start  with
  
 
  st        = 0
@@ -43,14 +126,10 @@ function startup()
  fill_stars()        -- populate stars array
 
  in_game   = -1      -- not started game yet
- cometheight1 = {
-	                x = 0,
-														   y = 0
-												   	} 
-	cometheight2 = {
-	                x = 0,
-														   y = 0
-												   	}
+ -- Initialise comet arrays
+ cometheight1 = {x = 0,y = 0} 
+ cometheight2 = {x = 0,y = 0} 
+	
 	-- Initialise rocket
  rocket = {
 	          t        = 266, -- sprite ID of rocket
@@ -64,6 +143,8 @@ function startup()
     	      hasfins  = 1    -- rocket has fins
          	}
  
+ -- set up the landing gear constants
+ setup_landinggear()
 
  rocket_start = rocket.y
  c            = 0         -- ticker before flame change
@@ -159,95 +240,141 @@ function launchpad()
  end
 end
 
+function displaycrawl()
+ -- Crawler instructions and backstory
+ print("NOT  LONG  AGO IN A",5,topcrawl-6,15,true,2,false)
+ print("PLACE KNOWN TO MOST",5,topcrawl+interval,15,true,2,false)
+ print("It is a period of intense competition.",5,topcrawl+(interval * 4),15,true,1,false)
+ print("Many  tests  of  different  ships have",5,topcrawl+(interval * 5),15,true,1,false)
+ print("been done in  hidden  proving grounds.",5,topcrawl+(interval * 6),15,true,1,false)
+ print("The  first  steps  against  government",5,topcrawl+(interval * 7),15,true,1,false)
+ print("controlled  space flight  have  begun.",5,topcrawl+(interval * 8),15,true,1,false)
+ print("During  the  tests, one  mighty  space",5,topcrawl+(interval * 10),15,true,1,false)
+ print("vehicle  towers  way above  the  rest.",5,topcrawl+(interval * 11),15,true,1,false)
+ print("SKY ROKIT,  a lean,  sleek,  beautiful",5,topcrawl+(interval * 12),15,true,1,false)
+ print("piece of engineering, carrying  enough",5,topcrawl+(interval * 13),15,true,1,false)
+ print("power to  beat the  others to the sky.",5,topcrawl+(interval * 14),15,true,1,false)
+ print("Watched by the government, there is  a",5,topcrawl+(interval * 16),15,true,1,false)
+ print("rush to get the  craft into the depths",5,topcrawl+(interval * 17),15,true,1,false)
+ print("of  space  in order to  show that  the",5,topcrawl+(interval * 18),15,true,1,false)
+ print("minnows  can  outsmart the  sharks and",5,topcrawl+(interval * 19),15,true,1,false)
+ print("gain freedom for the  skies  . . . . .",5,topcrawl+(interval * 20),15,true,1,false)
+ display_help(40,topcrawl+(interval * 23))
+	if 128-topcrawl <= finishcrawl then
+	 topcrawl = topcrawl - crawlspace
+	end
+end
 
+function display_help(mx,my)
+ -- show help screen and controls
+ map (0,0,10,5,mx,my,14,2)
+ print("<space> or   to start",mx+10,my+(interval*9),15,true,1,false)
+	spr(191,mx+75,my+(interval * 9)-2,10,1) 
+ print(" <UP> or   to thrust",58,topcrawl+(interval * 33),15,true,1,false)
+	spr(111,mx+71,my+(interval * 10)-2,10,1) 
+end
 
 -- Start Screen
 function startscreen()
- cls(8)
- spr(0,0,0,-1,1,0,0,15,15)
- spr(11,0,0,-1,1,0,0,1,1)
- spr(11,120,0,-1,1,0,0,4,8)
- spr(11,110,0,-1,1,0,0,4,8)
- spr(11,150,0,-1,1,1,0,4,8)
- spr(2,180,0,-1,1,1,0,2,6)
- spr(9,190,0,-1,1,1,0,2,6)
- spr(10,200,0,-1,1,1,0,2,6)
- spr(12,210,0,-1,1,1,0,2,6)
- spr(12,220,0,-1,1,1,0,2,6)
- spr(14,230,0,-1,1,1,0,2,6)
- spr(209,98,120,-1,1,1,0,2,1)
- spr(236,0,120,-1,1,1,0,1,1)
- spr(230,10,120,-1,4,1,0,2,1)
- spr(225,2,118,-1,1,0,0,2,1)
- spr(210,0,118,-1,1,0,0,1,1)
- spr(245,0,128,-1,1,0,0,2,1)
- spr(225,0,122,-1,1,0,0,2,1)
- spr(210,74,115,-1,1,1,0,2,1)
- spr(228,74,120,-1,1,1,0,1,2)
- spr(240,84,119,-1,1,1,0,1,1)
- spr(252,102,124,-1,1,0,0,1,1)
- spr(200,112,126,-1,1,0,0,1,1)
- spr(209,111,130,-1,1,0,0,1,1)
- spr(225,98,128,-1,1,1,0,2,2)
- spr(251,90,118,-1,1,1,0,1,1)
- spr(245,85,121,-1,1,1,0,1,1)
- spr(245,85,128,-1,1,1,0,1,1)
- spr(245,80,120,-1,1,1,0,1,1)
- spr(245,80,128,-1,1,1,0,1,1)
- spr(245,90,122,-1,1,1,0,1,1)
- spr(245,90,128,-1,1,1,0,1,1)
- logo=2
- fortic80=4
- spr(480,logo,90,0,2,0,0,10,2)
- spr(482,logo+157,90,0,2,0,0,2,2)
- spr(490,logo+188,90,0,2,0,0,3,2)
- spr(493,fortic80,125,0,1,0,0,3,1)
- spr(509,fortic80+35,125,0,1,0,0,3,1)
- spr(510,fortic80+60,125,0,1,0,3,1,1)
- spr(479,fortic80+70,125,0,1,0,0,1,1)
- spr(494,fortic80+80,125,0,1,0,0,1,1)
+ -- should show crawler ?
+ docrawl=docrawl+1
+ if docrawl >= TICS_IN_SEC * 10 then
+ 	displaycrawl()
+ else
+ -- Display Start  Screen
+	 cls(8)
+  spr(0,0,0,-1,1,0,0,15,15)
+  spr(11,0,0,-1,1,0,0,1,1)
+  spr(11,120,0,-1,1,0,0,4,8)
+  spr(11,110,0,-1,1,0,0,4,8)
+  spr(11,150,0,-1,1,1,0,4,8)
+  spr(2,180,0,-1,1,1,0,2,6)
+  spr(9,190,0,-1,1,1,0,2,6)
+  spr(10,200,0,-1,1,1,0,2,6)
+  spr(12,210,0,-1,1,1,0,2,6)
+  spr(12,220,0,-1,1,1,0,2,6)
+  spr(14,230,0,-1,1,1,0,2,6)
+  spr(209,98,120,-1,1,1,0,2,1)
+  spr(236,0,120,-1,1,1,0,1,1)
+  spr(230,10,120,-1,4,1,0,2,1)
+  spr(225,2,118,-1,1,0,0,2,1)
+  spr(210,0,118,-1,1,0,0,1,1)
+  spr(245,0,128,-1,1,0,0,2,1)
+  spr(225,0,122,-1,1,0,0,2,1)
+  spr(210,74,115,-1,1,1,0,2,1)
+  spr(228,74,120,-1,1,1,0,1,2)
+  spr(240,84,119,-1,1,1,0,1,1)
+  spr(252,102,124,-1,1,0,0,1,1)
+  spr(200,112,126,-1,1,0,0,1,1)
+  spr(209,111,130,-1,1,0,0,1,1)
+  spr(225,98,128,-1,1,1,0,2,2)
+  spr(251,90,118,-1,1,1,0,1,1)
+  spr(245,85,121,-1,1,1,0,1,1)
+  spr(245,85,128,-1,1,1,0,1,1)
+  spr(245,80,120,-1,1,1,0,1,1)
+  spr(245,80,128,-1,1,1,0,1,1)
+  spr(245,90,122,-1,1,1,0,1,1)
+  spr(245,90,128,-1,1,1,0,1,1)
+  -- patch tiles
+  spr(106,0,40,0,1,0,0,1,7)
+  spr(106,8,40,0,1,0,0,1,6)
+
+  logo=2
+  fortic80=4
+  spr(480,logo,90,0,2,0,0,10,2)
+  spr(482,logo+157,90,0,2,0,0,2,2)
+  spr(490,logo+188,90,0,2,0,0,3,2)
+  spr(493,fortic80,125,0,1,0,0,3,1)
+  spr(509,fortic80+35,125,0,1,0,0,3,1)
+  spr(510,fortic80+60,125,0,1,0,3,1,1)
+  spr(479,fortic80+70,125,0,1,0,0,1,1)
+  spr(494,fortic80+80,125,0,1,0,0,1,1)
 	
- print ("High Score: "..tostring(Phiscore),80,60)
- print("Press <space> to continue",82,80)
+	
+  print ("     High Score: "..tostring(Phiscore),80,60)
+  print("<space> or    to start",82,70)
+  print(" <UP> or    to thrust",82,80)
+	 spr(111,125,79,10,1) 
+	 spr(191,140,69,10,1) 
+  spr(478,120,125,0,1,0,0,1,1) 
 
- spr(478,120,125,0,1,0,0,1,1)
+  print("Andrew Shapton 2020",130,126,15,false,1,false)
+  print("V"..version,220,117,15,false,1,true)
+  
+  -- sound icon
+  spr(289,15,2,15,1,0,0,1,2)
+  -- music icon
+  spr(288,2,2,15,1,0,0,1,2) 
 
- print("Andrew Shapton 2020",130,126,15,false,1,false)
- print("V"..version,220,117,15,false,1,true)
- 
- -- sound icon
- spr(289,15,2,15,1,0,0,1,2)
- -- music icon
- spr(288,2,2,15,1,0,0,1,2)
+  --sound on/off
+  if keyp(24,1,1) then
+   sound_on = sound_on * -1
+  end
+  if sound_on == -1 then
+   print("Off",13,20,15,false,1,true)
+  else
+   print("On",15,20,15,false,1,true)
+  end
 
- --sound on/off
- if keyp(24,1,1) then
-  sound_on = sound_on * -1
+  --music on/off
+  if keyp(26,1,1) then
+   music_on = music_on * -1
+  end
+  if music_on == -1 then
+   music()
+   print("Off",1,20,15,false,1,true)
+  else
+   print("On",2,20,15,false,1,true)
+  end
+
  end
- if sound_on == -1 then
-  print("Off",13,20,15,false,1,true)
- else
-  print("On",15,20,15,false,1,true)
- end
-
- --music on/off
- if keyp(26,1,1) then
-  music_on = music_on * -1
- end
- if music_on == -1 then
-  music()
-  print("Off",1,20,15,false,1,true)
- else
-  print("On",2,20,15,false,1,true)
- end
-
  -- start  game ?
- if keyp(48,1,1) then
+ if keyp(48,1,1) or btnp(1,0,0) then
   in_game=0
   if music_on == 1 then
    music(0,0,0,true)
   end
- end   
+ end 
 end
 
 function display_starfield()
@@ -263,22 +390,38 @@ function display_starfield()
  end
 end
 
+function x2x(x,y,angle)
+ return (x * math.cos(angle)) - (y * math.sin(angle))
+end
+function y2y(x,y,angle)
+ return (x * math.cos(angle)) - (y * math.sin(angle))
+end
+
 function display_rocket()
 -- display the rocket in flight
 
 -- change flame sprite if required
- if c == 5 then
-  if rocket.t == 262 then
-   rocket.t=266
+ if show_payload == true then
+	 inc=16
+	else
+	 inc=0
+	end
+	if c == 5 then
+  if rocket.t == 262+inc then
+   rocket.t=266+inc
   else
-   rocket.t=262
+   rocket.t=262+inc
   end
   -- reset ticker to zero
   c = 0
  end
-		
- spr(rocket.t,rocket.x,rocket.y-1,0,1,0,0,4,10)
- if show_pad == 1 then
+ if show_payload==false then  
+  spr(rocket.t,rocket.x,rocket.y-1,0,1,0,0,4,10)
+ else
+  spr(rocket.t,rocket.x,rocket.y-1+8,0,1,0,0,4,10)
+ end	
+
+	if show_pad == 1 then
   spr(271,rocket.x,rocket.y+31,0,1,0,0,1,3)
   spr(271,rocket.x+23,rocket.y+31,0,1,1,0,1,3)
  else
@@ -333,6 +476,23 @@ function display_gauge()
 
 end
 
+
+function steer()
+ -- check for steering
+	if btnp(2,1,1)   then
+	-- steer left
+	if rocket.x > 2 then
+	  rocket.x=rocket.x - hsteer
+ end 
+	end
+	if btnp(3,1,1)   then
+	-- steer right
+	if rocket.x <190  then
+	  rocket.x=rocket.x + hsteer
+ end 
+	end
+
+end
 function display_score()
  -- Score
  if rocket.inflight == 1 then
@@ -396,7 +556,7 @@ end
 
 function manage_heat()
  if heatframe >= 60 then
-  if btnp(0,1,1) then
+  if btnp(0,1,1) or btnp(4,1,1) then
    heatbottom=heatbottom-heatuse
   else
    if heatbottom <= 137 then
@@ -426,17 +586,18 @@ function manage_gauges()
 end
 
 function angleBetweenPoints(a, b)
-deltaY = math.abs(b.y - a.y)
-deltaX = math.abs(b.x - a.x)
-return math.deg(math.atan2(deltaY,deltaX))
+ deltaY = math.abs(b.y - a.y)
+ deltaX = math.abs(b.x - a.x)
+ return math.deg(math.atan2(deltaY,deltaX))
 end
 
 function distance(p, q)
-dx   = p.x - q.x         
-dy   = p.y - q.y         
-dist = math.sqrt( dx*dx + dy*dy ) 
-return dist
+ dx   = p.x - q.x         
+ dy   = p.y - q.y         
+ dist = math.sqrt( dx*dx + dy*dy ) 
+ return dist
 end
+
 -- ================================== --
 --    M A J O R   F U N C T I O N S   --
 -- ================================== --
@@ -461,6 +622,14 @@ function display()
 		
  -- show launchpad ?
  launchpad()
+end
+
+function display_payload()
+ --pop payload  behind rocket
+ if show_payload == true then
+	 spr(260,payload.x+8,payload.y-1,14,1,0,0,2,2)
+  payload.y=payload.y-0.1
+ end
 end
 
 
@@ -537,14 +706,49 @@ end
 
 --- Main Loop (frame)
 function TIC()
- -- clear display before frame
+	-- clear display before frame
  cls(0)
+	
+ -- manage crawler time
+	if ((128-topcrawl) >= finishcrawl) and (in_game == -1) then		
+	 crawlstay = crawlstay + 1
+ end
+	
+	if crawlstay >= crawlstaytime  then
+	 crawlstay = 1
+		docrawl   = 0
+		topcrawl  = 128
+	end
+
+ -- check game state machine
  if in_game == -1 then
-  startscreen()
- else
+  startscreen() 
+	else
+	 if in_game == 1 then
+		 -- check for payload release
+			if keyp(17,0,0) then
+			 if payload.x < 0 then
+			  show_payload=true
+					payload.x = rocket.x
+				 payload.y = rocket.y
+				end 
+			end
+			-- check for landing gear release
+			if show_payload == true then
+    if show_landing_gear == false then
+     if rocket.hasfins == 0 then
+			   if btnp(1,0,0) then
+			     show_landing_gear=true
+			    end		
+			   end
+				end 
+			end
+		end 
   if in_game <2 then	
- 		heatframe = heatframe+1	
-  	if btnp(0,1,1) then
+ 		heatframe = heatframe+1
+			-- any steering required
+			steer()	
+  	if btnp(0,1,1) or btnp(4,1,1)  then
 		  if in_game == 0 then
 		   seconds = 0
     end
@@ -552,22 +756,28 @@ function TIC()
    rocket.inflight  = 1
    heattick = heattick+1	-- update heat ticker because fuel is being used
    fueltick = fueltick+1	-- update fuel ticker because fuel is being used
-   if rocket.y > 2 then
+   
+			if rocket.y > 2 then
 			  rocket.y=rocket.y-1
 		 end 
 		 else
 			 if rocket.y < 82 then
 			  rocket.y=rocket.y+1     
 			 end 
-		 end
+		 
+			end
 		
 		 -- update	 tickers
 		 c=c+1
 		 manage_gauges()	
-		end
-  -- show display
+	
+ end
+	 -- show display
   display()
+		display_payload()
+  landinggear()	
 	end
+ 
 end
 
 -- end:  Skyrokit

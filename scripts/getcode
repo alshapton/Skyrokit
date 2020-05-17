@@ -11,10 +11,16 @@ if [ $DIFF -eq 0 ]
   rm tmp.lua
   exit
  fi
-echo "[Rolling previous versions]"
+echo "[Rolling previous versions (Code)]"
 cp ../archive/skyrokit.lua.-2 ../archive/skyrokit.lua.-3
 cp ../archive/skyrokit.lua.-1 ../archive/skyrokit.lua.-2
 cp ../skyrokit.lua ../archive/skyrokit.lua.-1
+echo "[Rolling previous versions complete(Code)]"
+echo "[Rolling previous versions (TIC)]"
+echo "[Rolling previous versions complete(TIC)]"
+cp ../archive/skyrokit.tic.-2 ../archive/skyrokit.tic.-3
+cp ../archive/skyrokit.tic.-1 ../archive/skyrokit.tic.-2
+cp ../skyrokit.tic ../archive/skyrokit.tic.-1
 echo "[Rolling previous versions complete]"
 mv tmp.lua ../skyrokit.lua
 echo "[Finalised code extraction]"
