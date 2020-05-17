@@ -268,10 +268,23 @@ end
 function display_help(mx,my)
  -- show help screen and controls
  map (0,0,10,5,mx,my,14,2)
- print("<space> or   to start",mx+10,my+(interval*9),15,true,1,false)
-	spr(191,mx+75,my+(interval * 9)-2,10,1) 
- print(" <UP> or   to thrust",58,topcrawl+(interval * 33),15,true,1,false)
-	spr(111,mx+71,my+(interval * 10)-2,10,1) 
+
+ print("<space> or   to start",20,my+(interval*8)+2,15,true,1,true)
+	spr(191,mx+22,my+(interval * 8)+1,10,1) 
+ print(" <UP> or   to thrust",138,topcrawl+(interval * 31)+2,15,true,1,true)
+	spr(111,mx+131,my+(interval * 8)+1,10,1) 
+
+ print("<Q> or   for payload",22,topcrawl+(interval * 32)+1,15,true,1,true)
+	spr(175,mx+8,my+(interval * 9),10,1) 
+ print("<DOWN> or   for landing gear",124,topcrawl+(interval * 32)+1,15,true,1,true)
+	spr(191,mx+121,my+(interval * 9),10,1) 
+
+ print("<LEFT> & <RIGHT> or   &   to steer",55,topcrawl+(interval * 33)+1,15,true,1,true)
+	spr(207,mx+92,my+(interval * 10),10,1) 
+ spr(223,mx+108,my+(interval * 10),10,1) 
+ print("<DOWN> or   for landing gear",124,topcrawl+(interval * 32)+1,15,true,1,true)
+	spr(191,mx+121,my+(interval * 9),10,1) 
+
 end
 
 -- Start Screen

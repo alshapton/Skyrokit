@@ -1,0 +1,13 @@
+#!/bin/zsh
+
+echo "[Preparing environment]"
+cd ..
+echo "[Adding new/updated files]"
+git add .
+echo "[Added new/updated files]"
+read "?Enter commit message > " MESSAGE
+git commit -m $MESSAGE
+echo "[New/updated files staged]"
+git push
+echo "[Shove completed"]
+

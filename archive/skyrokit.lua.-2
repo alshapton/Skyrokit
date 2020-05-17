@@ -8,7 +8,7 @@
 -- ================================== --
 -- S T A R T   O F  F U N C T I O N S --
 -- ================================== --
-d
+
 function startup()
  hsteer       = 0.5 --- horizontal steering factor
  TICS_IN_SEC  = 60
